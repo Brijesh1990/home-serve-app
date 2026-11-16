@@ -1,0 +1,146 @@
+{
+  "info": {
+    "name": "HomeServe – Enterprise Home Services SaaS API v1",
+    "_postman_id": "d8f20e12-4c9a-4e21-8b77-92f41102a100",
+    "description": "Complete Postman API Collection for HomeServe (FastAPI + SQLAlchemy 2.x + MySQL 8.0) covering all 10 modules and 4 user roles.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8000/api/v1" },
+    { "key": "accessToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication & RBAC",
+      "item": [
+        {
+          "name": "POST /auth/login (Super Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@homeserve.com\",\n  \"password\": \"Password@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /auth/register (Customer)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Ananya Verma\",\n  \"email\": \"ananya@homeserve.com\",\n  \"phone\": \"+91 9820112233\",\n  \"password\": \"Password@123\",\n  \"role\": \"customer\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /auth/me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Categories & Services Marketplace",
+      "item": [
+        {
+          "name": "GET /categories",
+          "request": { "method": "GET", "url": "{{baseUrl}}/categories" }
+        },
+        {
+          "name": "GET /services",
+          "request": { "method": "GET", "url": "{{baseUrl}}/services?city=Mumbai&sort_by=featured" }
+        },
+        {
+          "name": "GET /providers",
+          "request": { "method": "GET", "url": "{{baseUrl}}/providers?verification_status=verified" }
+        }
+      ]
+    },
+    {
+      "name": "3. Bookings, Availability & Technician Dispatch",
+      "item": [
+        {
+          "name": "GET /availability/check",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/availability/check?provider_id=1&scheduled_date=2026-12-20&time_slot=10:30 AM"
+          }
+        },
+        {
+          "name": "POST /bookings",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/bookings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"service_id\": 1,\n  \"provider_id\": 1,\n  \"scheduled_date\": \"2026-12-20\",\n  \"time_slot\": \"10:30 AM\",\n  \"problem_description\": \"Complete MCB distribution board safety inspection\",\n  \"coupon_code\": \"WELCOME20\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /assignments",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/assignments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": 1,\n  \"technician_id\": 1\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Razorpay Payments, GST Invoices & Analytics",
+      "item": [
+        {
+          "name": "POST /payments/create-order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/payments/create-order",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"booking_id\": 1,\n  \"payment_type\": \"full\",\n  \"payment_method\": \"Razorpay\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /analytics/admin",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/analytics/admin"
+          }
+        },
+        {
+          "name": "GET /reports/bookings/export",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/reports/bookings/export"
+          }
+        }
+      ]
+    }
+  ]
+}
