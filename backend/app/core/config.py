@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 class Settings(BaseSettings):
     APP_NAME: str = "HomeServe API"
-    ENVIRONMENT: str = "development"
+    ENVIRONMENT: str = os.getenv("VERCEL_ENV", os.getenv("ENVIRONMENT", "development"))
     DATABASE_URL: str = "mysql+pymysql://root:admin@localhost:3306/homeserve_db"
     SECRET_KEY: str = "homeserve-enterprise-super-secret-jwt-key-2026-production-ready"
     ALGORITHM: str = "HS256"
@@ -25,20 +25,36 @@ class Settings(BaseSettings):
 
     PLATFORM_COMMISSION_PERCENT: float = 15.0
     TAX_PERCENT: float = 18.0
-    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000"
+    CORS_ORIGINS: str = "*"
 
     model_config = SettingsConfigDict(
-        env_file=str(BASE_DIR / ".env"),
+        env_file=(str(BASE_DIR / ".env"), str(BASE_DIR / ".env.production")),
         env_file_encoding="utf-8",
         extra="ignore",
     )
 
     @property
+    def normalized_database_url(self) -> str:
+        url = (self.DATABASE_URL or "").strip()
+        if url.startswith("mysql://"):
+            url = "mysql+pymysql://" + url[len("mysql://") :]
+        elif url.startswith("postgres://"):
+            url = "postgresql://" + url[len("postgres://") :]
+        return url
+
+    @property
     def cors_origin_list(self) -> List[str]:
         origins = [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
-        if "*" not in origins:
-            origins.extend(["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"])
-        return list(dict.fromkeys(origins))
+        default_origins = [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://localhost:3000",
+            "https://home-serve-app.vercel.app",
+        ]
+        for d in default_origins:
+            if d not in origins:
+                origins.append(d)
+        return origins
 
 
 settings = Settings()

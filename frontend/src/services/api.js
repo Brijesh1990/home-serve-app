@@ -1,10 +1,34 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const resolveApiBaseUrl = () => {
+  const rawEnvUrl = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
+  const isBrowser = typeof window !== 'undefined';
+  const isLocalhost =
+    isBrowser && ['localhost', '127.0.0.1'].includes(window.location.hostname);
+
+  if (rawEnvUrl) {
+    // Prevent accidental Mixed Content / Private Network errors if localhost URL is left in production build
+    if (!isLocalhost && (rawEnvUrl.includes('localhost') || rawEnvUrl.includes('127.0.0.1'))) {
+      return '/api/v1';
+    }
+    if (rawEnvUrl === '/api/v1' || rawEnvUrl.endsWith('/api/v1')) {
+      return rawEnvUrl;
+    }
+    return `${rawEnvUrl}/api/v1`;
+  }
+
+  if (isBrowser && !isLocalhost) {
+    return '/api/v1';
+  }
+
+  return 'http://localhost:8000/api/v1';
+};
+
+export const API_BASE_URL = resolveApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 8000,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },

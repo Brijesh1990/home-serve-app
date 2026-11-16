@@ -1,0 +1,15 @@
+{
+  "name": "homeserve-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "HomeServe – Enterprise Home Services Booking SaaS Platform (React 19 + FastAPI + MySQL 8.0)",
+  "scripts": {
+    "install:frontend": "npm --prefix frontend install --legacy-peer-deps",
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend install --legacy-peer-deps && npm --prefix frontend run build",
+    "preview": "npm --prefix frontend run preview"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
